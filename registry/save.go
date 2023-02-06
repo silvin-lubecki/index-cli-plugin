@@ -287,7 +287,12 @@ func SaveImage(image string, username string, password string, cli command.Cli) 
 		}, nil
 	}
 	// try remote image next
-	desc, err := remote.Get(ref, WithAuth(username, password))
+	// remote.WithTransport(cli.Client().HTTPClient().Transport) maybe use this option, with a custom transport
+	// Otherwise maybe force a transport with TLSConfig.InsecureSkipVerify = true
+	desc, err := remote.Get(ref, WithAuth(username, password), remote.WithPlatform(v1.Platform{
+		Architecture: "arm64",
+		OS:           "linux",
+	}))
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to pull image: %s", image)
 	}
